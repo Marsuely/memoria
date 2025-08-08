@@ -1,61 +1,105 @@
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background-color: #f0f0f0;
+const cardArray = [
+  { name: 'A', img: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fpop.proddigital.com.br%2Fanalises%2Fanalises-de-animacoes%2Fanalise-naruto&psig=AOvVaw2nAsilSempVOkPLu7U9gKT&ust=1754738778737000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi15r6N-44DFQAAAAAdAAAAABAX' },
+  { name: 'A', img: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fpop.proddigital.com.br%2Fanalises%2Fanalises-de-animacoes%2Fanalise-naruto&psig=AOvVaw2nAsilSempVOkPLu7U9gKT&ust=1754738778737000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi15r6N-44DFQAAAAAdAAAAABAX' },
+  { name: 'B', img: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Ftangsel.jawapos.com%2Flifestyle%2F2505160761%2Fbelajar-nilai-nilai-kehidupan-dari-naruto-anime-jepang-yang-mempopulerkan-negeri-konoha&psig=AOvVaw2nAsilSempVOkPLu7U9gKT&ust=1754738778737000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi15r6N-44DFQAAAAAdAAAAABAj' },
+  { name: 'B', img: '' },https://www.google.com/url?sa=i&url=https%3A%2F%2Ftangsel.jawapos.com%2Flifestyle%2F2505160761%2Fbelajar-nilai-nilai-kehidupan-dari-naruto-anime-jepang-yang-mempopulerkan-negeri-konoha&psig=AOvVaw2nAsilSempVOkPLu7U9gKT&ust=1754738778737000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi15r6N-44DFQAAAAAdAAAAABAj
+  { name: 'C', img: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fneox.atresmedia.com%2Fgames%2Fanime-manga%2Fguia-relleno-naruto-capitulos-mas-importantes-centrarse-solo-historia_20220304622216a3f6355200014a4d04.html&psig=AOvVaw2nAsilSempVOkPLu7U9gKT&ust=1754738778737000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi15r6N-44DFQAAAAAdAAAAABAv' },
+  { name: 'C', img: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fneox.atresmedia.com%2Fgames%2Fanime-manga%2Fguia-relleno-naruto-capitulos-mas-importantes-centrarse-solo-historia_20220304622216a3f6355200014a4d04.html&psig=AOvVaw2nAsilSempVOkPLu7U9gKT&ust=1754738778737000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi15r6N-44DFQAAAAAdAAAAABAv' },
+  { name: 'D', img: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fcuoi.tuoitre.vn%2Fnaruto-co-thuc-su-hoan-hao-p1-20250321165919191.htm&psig=AOvVaw2nAsilSempVOkPLu7U9gKT&ust=1754738778737000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi15r6N-44DFQAAAAAdAAAAABA7' },
+  { name: 'D', img: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fcuoi.tuoitre.vn%2Fnaruto-co-thuc-su-hoan-hao-p1-20250321165919191.htm&psig=AOvVaw2nAsilSempVOkPLu7U9gKT&ust=1754738778737000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi15r6N-44DFQAAAAAdAAAAABA7' }
+];
+
+// Se desejar mais pares, duplique objetos assim
+// { name: 'E', img: 'imagens/imagem5.png' }, etc.
+
+const grid = document.getElementById('grid');
+let cardsChosen = [], cardsChosenId = [], cardsWon = [];
+
+cardArray.sort(() => 0.5 - Math.random());
+
+function createBoard() {
+  grid.innerHTML = '';
+  cardsChosen = [];
+  cardsChosenId = [];
+  cardsWon = [];
+  cardArray.sort(() => 0.5 - Math.random());
+
+  cardArray.forEach((card, index) => {
+    const cardElement = document.createElement('div');
+    cardElement.classList.add('card');
+    cardElement.setAttribute('data-id', index);
+    cardElement.addEventListener('click', flipCard);
+
+    // Cria os lados da carta
+    const front = document.createElement('div');
+    front.className = 'front';
+    front.innerHTML = ''; // vazio inicialmente
+
+    const back = document.createElement('div');
+    back.className = 'back';
+    const img = document.createElement('img');
+    img.src = card.img;
+    back.appendChild(img);
+
+    cardElement.appendChild(front);
+    cardElement.appendChild(back);
+
+    grid.appendChild(cardElement);
+  });
 }
-h1 {
-  margin-top: 20px;
+
+function flipCard() {
+  const id = this.getAttribute('data-id');
+  if (cardsChosenId.includes(id) || this.classList.contains('flip')) return;
+
+  this.classList.add('flip');
+  // Mostra a imagem do lado de trás
+  const backImg = this.querySelector('.back img');
+  backImg.style.display = 'block';
+
+  cardsChosen.push(cardArray[id].name);
+  cardsChosenId.push(id);
+
+  if (cardsChosen.length === 2) {
+    setTimeout(checkForMatch, 500);
+  }
 }
-#nomeJogador {
-  font-weight: bold;
+
+function checkForMatch() {
+  const cards = document.querySelectorAll('.card');
+  const [firstId, secondId] = cardsChosenId;
+
+  if (cardsChosen[0] === cardsChosen[1]) {
+    // par encontrado, mantém viradas
+    cards[firstId].removeEventListener('click', flipCard);
+    cards[secondId].removeEventListener('click', flipCard);
+    // adiciona ao array de vencedores
+    cardsWon.push(cardsChosen);
+  } else {
+    // não é par, vira de volta
+    cards[firstId].classList.remove('flip');
+    cards[secondId].classList.remove('flip');
+
+    // Esconde as imagens
+    const firstBackImg = cards[firstId].querySelector('.back img');
+    const secondBackImg = cards[secondId].querySelector('.back img');
+    firstBackImg.style.display = 'none';
+    secondBackImg.style.display = 'none';
+  }
+
+  // Limpa escolhas
+  cardsChosen = [];
+  cardsChosenId = [];
+
+  if (cardsWon.length === cardArray.length / 2) {
+    alert('Parabéns! Você encontrou todos os pares!');
+  }
 }
-#tabuleiro {
-  display: grid;
-  grid-template-columns: repeat(3, 120px);
-  grid-gap: 10px;
-  justify-content: center;
-  margin: 20px auto;
+
+// Para reiniciar o jogo
+function reiniciarJogo() {
+  createBoard();
 }
-.carta {
-  width: 120px;
-  height: 120px;
-  background-color: #333;
-  border-radius: 8px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.carta img.frente {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.carta img.verso {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: none;
-}
-.carta.revelada img.frente {
-  display: none;
-}
-.carta.revelada img.verso {
-  display: block;
-}
-#resultado {
-  margin-top: 20px;
-  font-size: 1.2em;
-}
-button {
-  padding: 10px 20px;
-  font-size: 1em;
-  margin-top: 20px;
-  cursor: pointer;
-}
+
+// Inicializa
+createBoard();
