@@ -1,51 +1,99 @@
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: Arial, sans-serif;
+const animais = [
+  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊',
+  '🐻', '🐼', '🐨', '🐯', '🦁', '🐸'
+];
+
+let cartas = [];
+let primeiraCarta = null;
+let segundaCarta = null;
+let bloqueado = false;
+let paresEncontrados = 0;
+
+const jogoContainer = document.getElementById('jogo');
+const mensagem = document.getElementById('mensagem');
+const reiniciarBtn = document.getElementById('reiniciar');
+const nomeInput = document.getElementById('nome');
+
+function shuffle(array) {
+  for (let i = array.length -1; i >0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
-h1 {
-  margin-top: 20px;
+
+function inicializarJogo() {
+  paresEncontrados = 0;
+  mensagem.textContent = '';
+  primeiraCarta = null;
+  segundaCarta = null;
+  bloqueado = false;
+
+  // Preparar as cartas: duplicar e embaralhar
+  const cartasAnimais = [...animais, ...animais];
+  shuffle(cartasAnimais);
+
+  // Limpar o container
+  jogoContainer.innerHTML = '';
+
+  // Criar as cartas
+  cartasAnimais.forEach((animal, index) => {
+    const carta = document.createElement('div');
+    carta.className = 'carta';
+    carta.dataset.animals = animal;
+    carta.dataset.index = index;
+    carta.textContent = '';
+    carta.addEventListener('click', viradaCarta);
+    jogoContainer.appendChild(carta);
+  });
 }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 100px);
-  gap: 10px;
-  margin: 20px;
+
+function viradaCarta(e) {
+  if (bloqueado) return;
+
+  const carta = e.currentTarget;
+
+  // Se já estiver virada ou combinada, ignore
+  if (carta.textContent !== '') return;
+
+  // Mostrar o animal
+  carta.textContent = carta.dataset.animals;
+
+  if (!primeiraCarta) {
+    primeiraCarta = carta;
+  } else if (primeiraCarta && !segundaCarta && carta !== primeiraCarta) {
+    segundaCarta = carta;
+    verificarPar();
+  }
 }
-.card {
-  width: 100px;
-  height: 100px;
-  background-color: #2e3d49;
-  cursor: pointer;
-  border-radius: 8px;
-  transform-style: preserve-3d;
-  transition: transform 0.5s;
-  position: relative;
+
+function verificarPar() {
+  if (primeiraCarta.dataset.animals === segundaCarta.dataset.animals) {
+    // Encontrou um par
+    paresEncontrados++;
+    mensagem.textContent = `Par encontrado! Total: ${paresEncontrados}`;
+    primeiraCarta = null;
+    segundaCarta = null;
+
+    if (paresEncontrados === 6) {
+      mensagem.textContent = `Parabéns, ${nomeInput.value || 'Jogador'}! Você ganhou!`;
+    }
+  } else {
+    // Não é par, esconder após um delay
+    bloqueado = true;
+    setTimeout(() => {
+      primeiraCarta.textContent = '';
+      segundaCarta.textContent = '';
+      primeiraCarta = null;
+      segundaCarta = null;
+      bloqueado = false;
+    }, 1000);
+  }
 }
-.card.flip {
-  transform: perspective(600px) rotateY(180deg);
-}
-.card .front,
-.card .back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.front {
-  background-color: #2e3d49;
-  font-size: 2em;
-  color: #fff;
-}
-.back {
-  transform: rotateY(180deg);
-}
-img {
-  max-width: 80%;
-  max-height: 80%;
-}
+
+document.getElementById('reiniciar').addEventListener('click', inicializarJogo);
+
+// Iniciar o jogo ao carregar a página
+window.onload = () => {
+  inicializarJogo();
+};
